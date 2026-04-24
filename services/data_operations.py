@@ -207,7 +207,7 @@ def mark_application_response(application_id: str, received: bool) -> Dict[str, 
 
 def get_proposals(
     user_id: Optional[str] = None,
-    template: Optional[bool] = None,
+    template: Optional[str] = None,
     limit: int = 100
 ) -> List[Dict[str, Any]]:
     supabase = get_supabase_client()
@@ -217,7 +217,7 @@ def get_proposals(
         query = query.eq("user_id", user_id)
     
     if template is not None:
-        query = query.eq("template", str(template).lower())
+        query = query.eq("template", template)
     
     result = query.execute()
     return result.data
