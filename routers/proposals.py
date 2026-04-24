@@ -13,7 +13,7 @@ router = APIRouter(prefix="/proposals", tags=["Proposals"])
 @router.get("/", response_model=ProposalListResponse)
 async def get_proposals(
     user_id: Optional[str] = Query(None),
-    template: Optional[bool] = Query(None),
+    template: Optional[str] = Query(None),
     limit: int = Query(100, ge=1, le=1000)
 ):
     proposals = data_operations.get_proposals(
