@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from routers import jobs, filters, matching, users, proposals, ai
+from routers import jobs, filters, matching, users, proposals
 
 app = FastAPI(
     title="FYP Job Matching API",
@@ -56,7 +56,6 @@ app.include_router(filters.router)
 app.include_router(matching.router)
 app.include_router(users.router)
 app.include_router(proposals.router)
-app.include_router(ai.router)
 
 @app.get("/", tags=["Info"])
 async def root():
