@@ -2,40 +2,37 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
-class ApplicationBase(BaseModel):
-    pool_entry_id: str
+class ProposalBase(BaseModel):
     user_id: str
-    status: str = "draft"
-    cover_letter: Optional[str] = None
-    notes: Optional[str] = None
+    proposal_name: str
+    title: str
+    instructions: Optional[str] = None
+    context: Optional[str] = None
+    template: bool = False
+    ai_model: Optional[str] = "gpt-4"
+    hourly_rate: Optional[float] = 0.0
+    fixed_rate: Optional[float] = 0.0
 
-class ApplicationCreate(ApplicationBase):
+class ProposalCreate(ProposalBase):
     pass
 
-class ApplicationUpdate(BaseModel):
-    status: Optional[str] = None
-    cover_letter: Optional[str] = None
-    notes: Optional[str] = None
-    response_received: Optional[bool] = None
-    applied_at: Optional[datetime] = None
+class ProposalUpdate(BaseModel):
+    proposal_name: Optional[str] = None
+    title: Optional[str] = None
+    instructions: Optional[str] = None
+    context: Optional[str] = None
+    template: Optional[bool] = None
+    ai_model: Optional[str] = None
+    hourly_rate: Optional[float] = None
+    fixed_rate: Optional[float] = None
 
-class ApplicationResponse(ApplicationBase):
-    application_id: str
-    applied_at: Optional[datetime] = None
-    response_received: bool = False
+class ProposalResponse(ProposalBase):
+    proposal_id: str
     created_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
 
-class ApplicationListResponse(BaseModel):
-    applications: list
+class ProposalListResponse(BaseModel):
+    proposals: list
     total: int
-
-class MarkAppliedResponse(BaseModel):
-    application_id: str
-    status: str
-    applied_at: datetime
-
-class MarkResponseRequest(BaseModel):
-    received: bool

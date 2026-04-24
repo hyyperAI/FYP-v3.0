@@ -66,7 +66,10 @@ def create_filter(filter_data: Dict[str, Any]) -> Dict[str, Any]:
 def update_filter(filter_id: str, filter_data: Dict[str, Any]) -> Dict[str, Any]:
     supabase = get_supabase_client()
     result = supabase.table("filters").update(filter_data).eq("filter_id", filter_id).execute()
-    trigger_matching(filter_id)
+    try:
+        trigger_matching(filter_id)
+    except Exception:
+        pass
     return result.data[0]
 
 def delete_filter(filter_id: str) -> bool:
@@ -201,3 +204,40 @@ def mark_application_response(application_id: str, received: bool) -> Dict[str, 
         "response_received": received
     }).eq("application_id", application_id).execute()
     return result.data[0]
+
+def get_proposals(
+    user_id: Optional[str] = None,
+    template: Optional[bool] = None,
+    limit: int = 100
+) -> List[Dict[str, Any]]:
+    supabase = get_supabase_client()
+    query = supabase.table("proposals").select("*").limit(limit)
+    
+    if user_id:
+        query = query.eq("user_id", user_id)
+    
+    if template is not None:
+        query = query.eq("template", str(template).lower())
+    
+    result = query.execute()
+    return result.data
+
+def get_proposal_by_id(proposal_id: str) -> Optional[Dict[str, Any]]:
+    supabase = get_supabase_client()
+    result = supabase.table("proposals").select("*").eq("proposal_id", proposal_id).execute()
+    return result.data[0] if result.data else None
+
+def create_proposal(proposal_data: Dict[str, Any]) -> Dict[str, Any]:
+    supabase = get_supabase_client()
+    result = supabase.table("proposals").insert(proposal_data).execute()
+    return result.data[0]
+
+def update_proposal(proposal_id: str, proposal_data: Dict[str, Any]) -> Dict[str, Any]:
+    supabase = get_supabase_client()
+    result = supabase.table("proposals").update(proposal_data).eq("proposal_id", proposal_id).execute()
+    return result.data[0]
+
+def delete_proposal(proposal_id: str) -> bool:
+    supabase = get_supabase_client()
+    supabase.table("proposals").delete().eq("proposal_id", proposal_id).execute()
+    return True

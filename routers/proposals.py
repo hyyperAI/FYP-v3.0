@@ -1,101 +1,56 @@
 from fastapi import APIRouter, HTTPException, Query
 from typing import Optional
 from models.proposal_models import (
-    ApplicationCreate, 
-    ApplicationUpdate, 
-    ApplicationResponse, 
-    ApplicationListResponse,
-    MarkResponseRequest
+    ProposalCreate, 
+    ProposalUpdate, 
+    ProposalResponse, 
+    ProposalListResponse
 )
 from services import data_operations
 
 router = APIRouter(prefix="/proposals", tags=["Proposals"])
 
-@router.get("/", response_model=ApplicationListResponse)
-async def get_applications(
+@router.get("/", response_model=ProposalListResponse)
+async def get_proposals(
     user_id: Optional[str] = Query(None),
-    status: Optional[str] = Query(None),
+    template: Optional[bool] = Query(None),
     limit: int = Query(100, ge=1, le=1000)
 ):
-    applications = data_operations.get_applications(
+    proposals = data_operations.get_proposals(
         user_id=user_id, 
-        status=status, 
+        template=template, 
         limit=limit
     )
-    return ApplicationListResponse(applications=applications, total=len(applications))
+    return ProposalListResponse(proposals=proposals, total=len(proposals))
 
-@router.get("/{application_id}", response_model=ApplicationResponse)
-async def get_application(application_id: str):
-    application = data_operations.get_application_by_id(application_id)
-    if not application:
-        raise HTTPException(status_code=404, detail="Application not found")
-    return ApplicationResponse(**application)
+@router.get("/{proposal_id}", response_model=ProposalResponse)
+async def get_proposal(proposal_id: str):
+    proposal = data_operations.get_proposal_by_id(proposal_id)
+    if not proposal:
+        raise HTTPException(status_code=404, detail="Proposal not found")
+    return ProposalResponse(**proposal)
 
-@router.get("/pool/{pool_entry_id}")
-async def get_application_by_pool(pool_entry_id: str, user_id: Optional[str] = None):
-    application = data_operations.get_application_by_pool_entry(pool_entry_id, user_id)
-    if not application:
-        raise HTTPException(status_code=404, detail="No application found for this pool entry")
-    return ApplicationResponse(**application)
+@router.post("/", response_model=ProposalResponse)
+async def create_proposal(proposal: ProposalCreate):
+    proposal_data = proposal.model_dump()
+    created_proposal = data_operations.create_proposal(proposal_data)
+    return ProposalResponse(**created_proposal)
 
-@router.post("/", response_model=ApplicationResponse)
-async def create_application(application: ApplicationCreate):
-    existing = data_operations.get_application_by_pool_entry(
-        application.pool_entry_id, 
-        application.user_id
-    )
-    if existing:
-        raise HTTPException(status_code=400, detail="Application already exists for this job")
-    
-    application_data = application.model_dump()
-    created_application = data_operations.create_application(application_data)
-    return ApplicationResponse(**created_application)
-
-@router.put("/{application_id}", response_model=ApplicationResponse)
-async def update_application(application_id: str, application: ApplicationUpdate):
-    existing = data_operations.get_application_by_id(application_id)
+@router.put("/{proposal_id}", response_model=ProposalResponse)
+async def update_proposal(proposal_id: str, proposal: ProposalUpdate):
+    existing = data_operations.get_proposal_by_id(proposal_id)
     if not existing:
-        raise HTTPException(status_code=404, detail="Application not found")
+        raise HTTPException(status_code=404, detail="Proposal not found")
     
-    application_data = application.model_dump(exclude_unset=True)
-    updated_application = data_operations.update_application(application_id, application_data)
-    return ApplicationResponse(**updated_application)
+    proposal_data = proposal.model_dump(exclude_unset=True)
+    updated_proposal = data_operations.update_proposal(proposal_id, proposal_data)
+    return ProposalResponse(**updated_proposal)
 
-@router.delete("/{application_id}")
-async def delete_application(application_id: str):
-    existing = data_operations.get_application_by_id(application_id)
+@router.delete("/{proposal_id}")
+async def delete_proposal(proposal_id: str):
+    existing = data_operations.get_proposal_by_id(proposal_id)
     if not existing:
-        raise HTTPException(status_code=404, detail="Application not found")
+        raise HTTPException(status_code=404, detail="Proposal not found")
     
-    data_operations.delete_application(application_id)
-    return {"message": "Application deleted successfully"}
-
-@router.post("/{application_id}/apply")
-async def mark_application_applied(application_id: str):
-    existing = data_operations.get_application_by_id(application_id)
-    if not existing:
-        raise HTTPException(status_code=404, detail="Application not found")
-    
-    if existing.get("status") == "applied":
-        raise HTTPException(status_code=400, detail="Application already applied")
-    
-    result = data_operations.mark_application_applied(application_id)
-    return {
-        "message": "Application marked as applied",
-        "application_id": result["application_id"],
-        "status": result["status"],
-        "applied_at": result["applied_at"]
-    }
-
-@router.post("/{application_id}/response")
-async def mark_application_response(application_id: str, payload: MarkResponseRequest):
-    existing = data_operations.get_application_by_id(application_id)
-    if not existing:
-        raise HTTPException(status_code=404, detail="Application not found")
-    
-    result = data_operations.mark_application_response(application_id, payload.received)
-    return {
-        "message": f"Response marked as {'received' if payload.received else 'not received'}",
-        "application_id": result["application_id"],
-        "response_received": result["response_received"]
-    }
+    data_operations.delete_proposal(proposal_id)
+    return {"message": "Proposal deleted successfully"}
