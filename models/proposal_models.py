@@ -8,7 +8,7 @@ class ProposalBase(BaseModel):
     title: str
     instructions: Optional[str] = None
     context: Optional[str] = None
-    template: bool = False
+    template: str = "false"
     ai_model: Optional[str] = "gpt-4"
     hourly_rate: Optional[float] = 0.0
     fixed_rate: Optional[float] = 0.0
@@ -21,7 +21,7 @@ class ProposalUpdate(BaseModel):
     title: Optional[str] = None
     instructions: Optional[str] = None
     context: Optional[str] = None
-    template: Optional[bool] = None
+    template: Optional[str] = None
     ai_model: Optional[str] = None
     hourly_rate: Optional[float] = None
     fixed_rate: Optional[float] = None
