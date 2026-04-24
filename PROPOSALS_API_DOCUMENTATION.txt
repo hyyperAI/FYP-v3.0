@@ -1,0 +1,185 @@
+# Proposals API Documentation
+
+**Base URL:** `http://159.65.225.228:8000`  
+**Endpoint Prefix:** `/proposals`
+
+---
+
+## 1. GET /proposals/
+
+**Description:** Fetch all proposals with optional filters.
+
+**URL:** `http://159.65.225.228:8000/proposals/`
+
+### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `user_id` | string (UUID) | No | Filter proposals by user ID |
+| `template` | boolean | No | Filter by template status (`true` or `false`) |
+| `limit` | integer | No | Maximum number of results (default: 100, max: 1000) |
+
+### Example Requests
+
+```bash
+# Get all proposals
+curl -X GET "http://159.65.225.228:8000/proposals/"
+
+# Get proposals for specific user
+curl -X GET "http://159.65.225.228:8000/proposals/?user_id=550e8400-e29b-41d4-a716-446655440000"
+
+# Get template proposals only
+curl -X GET "http://159.65.225.228:8000/proposals/?template=true"
+```
+
+### Response Structure
+
+```json
+{
+  "proposals": [
+    {
+      "proposal_id": "string (UUID)",
+      "user_id": "string (UUID)",
+      "proposal_name": "string",
+      "title": "string",
+      "instructions": "string",
+      "context": "string",
+      "template": "boolean",
+      "ai_model": "string",
+      "hourly_rate": "number",
+      "fixed_rate": "number",
+      "created_at": "string (ISO 8601 datetime)"
+    }
+  ],
+  "total": "integer"
+}
+```
+
+---
+
+## 2. GET /proposals/{proposal_id}
+
+**Description:** Fetch a single proposal by its ID.
+
+
+**URL:** `http://159.65.225.228:8000/proposals/{proposal_id}`
+
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `proposal_id` | string (UUID) | Yes | The unique proposal identifier |
+
+### Example Request
+
+```bash
+curl -X GET "http://159.65.225.228:8000/proposals/db4481a5-0fa2-4f4b-a617-056642acb85d"
+```
+
+### Response Structure
+
+```json
+{
+  "proposal_id": "string (UUID)",
+  "user_id": "string (UUID)",
+  "proposal_name": "string",
+  "title": "string",
+  "instructions": "string",
+  "context": "string",
+  "template": "boolean",
+  "ai_model": "string",
+  "hourly_rate": "number",
+  "fixed_rate": "number",
+  "created_at": "string (ISO 8601 datetime)"
+}
+```
+
+---
+
+
+## 3. POST /proposals/
+
+**Description:** Create a new proposal.
+
+**URL:** `http://159.65.225.228:8000/proposals/`
+
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `user_id` | string (UUID) | Yes | The user creating this proposal |
+| `proposal_name` | string | Yes | Name for the proposal template |
+| `title` | string | Yes | Proposal title |
+| `instructions` | string | No | AI prompt instructions |
+| `context` | string | No | User's background and skills |
+| `template` | boolean | No | Reusable template (default: false) |
+| `ai_model` | string | No | AI model to use (default: gpt-4) |
+| `hourly_rate` | number | No | Desired hourly rate |
+| `fixed_rate` | number | No | Desired fixed project rate |
+
+### Example Request
+
+```bash
+curl -X POST "http://159.65.225.228:8000/proposals/" \
+  -H "Content-Type: application/json" \
+  -d '{"user_id": "550e8400-e29b-41d4-a716-446655440000", "proposal_name": "My Proposal", "title": "Full Stack Developer", "template": true}'
+```
+
+---
+
+## 4. PUT /proposals/{proposal_id}
+
+
+**Description:** Update an existing proposal.
+
+**URL:** `http://159.65.225.228:8000/proposals/{proposal_id}`
+
+
+### Request Body (All fields optional)
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `proposal_name` | string | Updated name |
+| `title` | string | Updated title |
+| `instructions` | string | Updated instructions |
+| `context` | string | Updated context |
+| `template` | boolean | Updated template status |
+| `ai_model` | string | Updated AI model |
+| `hourly_rate` | number | Updated hourly rate |
+| `fixed_rate` | number | Updated fixed rate |
+
+---
+
+## 5. DELETE /proposals/{proposal_id}
+
+**Description:** Delete a proposal.
+
+
+**URL:** `http://159.65.225.228:8000/proposals/{proposal_id}`
+
+### Response
+
+```json
+{"message": "Proposal deleted successfully"}
+```
+
+
+---
+
+## Field Definitions
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `proposal_id` | UUID | Unique identifier |
+| `user_id` | UUID | User who created the proposal |
+| `proposal_name` | string | Human-readable name |
+| `title` | string | Title for the proposal |
+| `instructions` | string | AI prompt instructions |
+| `context` | string | User's background, skills, experience |
+| `template` | boolean | Reusable template flag |
+| `ai_model` | string | AI model (e.g., gpt-4) |
+| `hourly_rate` | number | Hourly rate in USD |
+| `fixed_rate` | number | Fixed project rate in USD |
+| `created_at` | datetime | Creation timestamp |
