@@ -45,12 +45,7 @@ For questions or issues, check the project documentation.
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://fyp-itt7f.ondigitalocean.app",
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "*"
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
