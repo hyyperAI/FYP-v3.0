@@ -45,7 +45,7 @@ For questions or issues, check the project documentation.
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://161.35.52.189", "http://161.35.52.189/"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
